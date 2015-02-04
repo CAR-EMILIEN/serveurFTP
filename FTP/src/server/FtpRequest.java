@@ -1,5 +1,7 @@
 package server;
 
+import static util.Messages.*;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -13,6 +15,10 @@ public class FtpRequest extends Thread {
 	protected Serveur s;
 	protected Boolean active;
 	private HashMap<String, String> map;
+	
+	
+	
+	
 	
 	public FtpRequest(Socket connexion, String msg, HashMap<String, String> map) {
 		this.connexion = connexion;
@@ -32,6 +38,7 @@ public class FtpRequest extends Thread {
 		{
 			case "USER":
 				rep = processUSER(tmp[1]);
+				System.out.println(rep);
 				break;
 			case "QUIT":
 				rep = processQUIT(); 
@@ -40,26 +47,34 @@ public class FtpRequest extends Thread {
 			default:
 				rep = "111 error\n";
 		}
+		System.out.println(rep +"1");
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 		out.writeBytes(rep);
 	}
-
+	
 	public String processUSER(String msg){
 		String rep = "";
-		System.out.println(msg);
+		//System.out.println(msg);
 		if(map.containsKey(msg))
 		{
-			rep = "331 User name okay, need password.\n";
+			rep = USER_OK;
 			this.user = msg;
 		}
 		else
-			rep = "332 Need account for login.\n";
+			rep = USER_NEED_ACCOUNT ;
 		return rep;
 	}
 	
 	public String processPASS(String msg)
 	{
-		return "";		
+		String rep = "";
+		if(map.get(this.user).equals(msg)){
+			rep = PASS_OK;
+		}
+		else{
+			rep = PASS_ERROR;
+		}
+		return rep;		
 	}	
 	
 	public String processRETR(String msg)
@@ -78,7 +93,7 @@ public class FtpRequest extends Thread {
 	public String processQUIT()
 	{
 		String rep = "";
-		rep = "355 quit\n";
+		rep = QUIT;
 		return rep;
 	}
 	public void run()
