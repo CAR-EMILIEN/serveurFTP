@@ -23,7 +23,7 @@ public class Serveur {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		Serveur serveur = new Serveur(1023);
+		Serveur serveur = new Serveur(4000);
 		String message = new String();
 		while (true) {
 			Socket connexion = serveur.socket.accept();
