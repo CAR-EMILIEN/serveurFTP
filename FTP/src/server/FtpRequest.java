@@ -34,11 +34,11 @@ public class FtpRequest extends Thread {
 				rep = processUSER(tmp[1]);
 				break;
 			case "QUIT":
-				rep = processQUIT(); // TODO verifier paske la on coupe avant denvoyer le msg!
+				rep = processQUIT(); 
 				this.active = false;
 				break;
 			default:
-				rep = "111 error";
+				rep = "111 error\n";
 		}
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 		out.writeBytes(rep);
@@ -78,7 +78,7 @@ public class FtpRequest extends Thread {
 	public String processQUIT()
 	{
 		String rep = "";
-		rep = "355 quit";
+		rep = "355 quit\n";
 		return rep;
 	}
 	public void run()

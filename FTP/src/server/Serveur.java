@@ -33,19 +33,18 @@ public class Serveur {
 	public static void main(String[] args) throws IOException {
 		Serveur serveur = new Serveur(4000);
 		String message = new String();
-		Boolean active = true;
+		//Boolean active = true;
 		while (true) {
 			Socket connexion = serveur.socket.accept();
 			InputStream is = connexion.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); // TODO mettre seulement en 1ere connexion
 			out.writeBytes("220 Service Ready for new user\n");
-			do {
+			while ((message = br.readLine()) != null) {
 				FtpRequest requete = new FtpRequest(connexion,message,serveur.map_user);
 				requete.processRequest(message);
-				active = requete.active;
+				//active = requete.active;
 			}
-			while ((message = br.readLine()) != null && active);
 			connexion.close();
 		}
 
