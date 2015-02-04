@@ -21,6 +21,7 @@ public class Serveur {
 		this.socket = new ServerSocket(port);
 	}
 	
+	// pour les tests 
 	public Serveur(int port,String filename) throws IOException
 	{
 		this.map_user = new HashMap<String,String>();
@@ -32,16 +33,19 @@ public class Serveur {
 	public static void main(String[] args) throws IOException {
 		Serveur serveur = new Serveur(4000);
 		String message = new String();
+		Boolean active = true;
 		while (true) {
 			Socket connexion = serveur.socket.accept();
 			InputStream is = connexion.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); // TODO mettre seulement en 1ere connexion
 			out.writeBytes("220 Service Ready for new user\n");
-			while ((message = br.readLine()) != null) {
+			do {
 				FtpRequest requete = new FtpRequest(connexion,message,serveur.map_user);
 				requete.processRequest(message);
+				active = requete.active;
 			}
+			while ((message = br.readLine()) != null && active);
 			connexion.close();
 		}
 
