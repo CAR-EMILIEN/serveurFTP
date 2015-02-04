@@ -1,5 +1,7 @@
 package server;
 
+import static util.Messages.*;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileReader;
@@ -10,6 +12,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
+/**
+ * 
+ * Classe gérant le serveur FTP.
+ * 
+ * @author Rousé & Allart
+ */
 public class Serveur {
 	protected HashMap<String, String> map_user;
 	protected ServerSocket socket;
@@ -39,7 +47,7 @@ public class Serveur {
 			InputStream is = connexion.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); // TODO mettre seulement en 1ere connexion
-			out.writeBytes("220 Service Ready for new user\n");
+			out.writeBytes(SERVEUR_SERVICE_READY);
 			do {
 				FtpRequest requete = new FtpRequest(connexion,message,serveur.map_user);
 				requete.processRequest(message);

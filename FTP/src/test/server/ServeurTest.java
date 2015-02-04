@@ -19,8 +19,6 @@ public class ServeurTest{
 	public void setUp() throws Exception {
 	}
 
-
-
 	@Test
 	public void test_load_map_user() throws IOException {
 		String filename = "Data/Test/test_load_map_user.txt";
@@ -31,7 +29,7 @@ public class ServeurTest{
 		writer.println("EMILIEN 321");
 		writer.close();
 			
-		Serveur s = new Serveur(filename);
+		Serveur s = new Serveur(4000,filename);
 		HashMap<String, String> hm = s.getMap_user();
 		
 		assertTrue("123".equals(hm.get("TOTO")));

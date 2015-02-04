@@ -1,5 +1,7 @@
 package server;
 
+import static util.Messages.*;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -46,14 +48,14 @@ public class FtpRequest extends Thread {
 
 	public String processUSER(String msg){
 		String rep = "";
-		System.out.println(msg);
+		//System.out.println(msg);
 		if(map.containsKey(msg))
 		{
-			rep = "331 User name okay, need password.\n";
+			rep = USER_OK;
 			this.user = msg;
 		}
 		else
-			rep = "332 Need account for login.\n";
+			rep = USER_NEED_ACCOUNT ;
 		return rep;
 	}
 	
@@ -78,7 +80,7 @@ public class FtpRequest extends Thread {
 	public String processQUIT()
 	{
 		String rep = "";
-		rep = "355 quit";
+		rep = QUIT;
 		return rep;
 	}
 	public void run()
