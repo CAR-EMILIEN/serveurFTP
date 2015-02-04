@@ -11,7 +11,13 @@ public class Serveur {
 	public Serveur() throws IOException
 	{	
 		this.map_user = new HashMap<String,String>();
-		this.load_map_user();
+		this.load_map_user("Data/map_user");
+	}
+	
+	public Serveur(String filename) throws IOException
+	{
+		this.map_user = new HashMap<String,String>();
+		this.load_map_user(filename);
 	}
 	
 	public static void main(String[] args) {
@@ -21,7 +27,7 @@ public class Serveur {
 	/**
 	 * read into the file containing authorized user and load them into a HashMap 
 	 * 
-	 * @param void
+	 * @param  filename the file to open and to load into the HashMap
 	 * @return void 
 	 * 
 	 * @sideeffect fill map_user with users and their password
@@ -29,11 +35,11 @@ public class Serveur {
 	 * 		
 	 * @throws IOException
 	 */
-	public void load_map_user() throws IOException
+	public void load_map_user(String filename) throws IOException
 	{
 		String s = "";
 		String[] tab = null;
-		FileReader f = new FileReader("Data/map_user");
+		FileReader f = new FileReader(filename);
 		BufferedReader br = new BufferedReader(f);
 		while((s = br.readLine())!=null)
 		{
