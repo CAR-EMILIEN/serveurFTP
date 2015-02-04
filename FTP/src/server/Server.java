@@ -24,6 +24,7 @@ public class Server {
 		String s = "";
 		String[] tab = null;
 		FileReader f = new FileReader("Data/map_user");
+		@SuppressWarnings("resource")
 		BufferedReader br = new BufferedReader(f);
 		while((s = br.readLine())!=null)
 		{
