@@ -16,6 +16,10 @@ public class FtpRequest extends Thread {
 	protected Boolean active;
 	private HashMap<String, String> map;
 	
+	
+	
+	
+	
 	public FtpRequest(Socket connexion, String msg, HashMap<String, String> map) {
 		this.connexion = connexion;
 		this.msg = msg;
@@ -34,6 +38,7 @@ public class FtpRequest extends Thread {
 		{
 			case "USER":
 				rep = processUSER(tmp[1]);
+				System.out.println(rep);
 				break;
 			case "QUIT":
 				rep = processQUIT(); // TODO verifier paske la on coupe avant denvoyer le msg!
@@ -42,10 +47,11 @@ public class FtpRequest extends Thread {
 			default:
 				rep = "111 error";
 		}
+		System.out.println(rep +"1");
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 		out.writeBytes(rep);
 	}
-
+	
 	public String processUSER(String msg){
 		String rep = "";
 		//System.out.println(msg);
@@ -61,7 +67,14 @@ public class FtpRequest extends Thread {
 	
 	public String processPASS(String msg)
 	{
-		return "";		
+		String rep = "";
+		if(map.get(this.user).equals(msg)){
+			rep = PASS_OK;
+		}
+		else{
+			rep = PASS_ERROR;
+		}
+		return rep;		
 	}	
 	
 	public String processRETR(String msg)

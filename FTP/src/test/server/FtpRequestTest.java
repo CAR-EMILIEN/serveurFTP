@@ -12,17 +12,20 @@ import server.FtpRequest;
 
 public class FtpRequestTest {
 
+	FtpRequest f;
 	@Before
 	public void setUp() throws Exception {
+		String msg_init = "USER TOTO";
+		HashMap<String,String> hm = new HashMap<>();
+		hm.put("TOTO", "963");
+		f = new FtpRequest(null, msg_init, hm);
 	}
 
 	@Test
 	public void test_processUSER() {
 		
 		String msg = "TOTO";
-		HashMap<String,String> hm = new HashMap<>();
-		hm.put("TOTO", "963");
-		FtpRequest f = new FtpRequest(null, msg, hm);
+		
 		String reponse = f.processUSER(msg);
 		assertTrue(reponse.equals(USER_OK));
 		
@@ -34,10 +37,22 @@ public class FtpRequestTest {
 	}
 	
 	@Test
+	public void test_processPASS() {
+		String user = "TOTO";
+		String msg = "963";
+		
+		f.processUSER(user);
+		String reponse = f.processPASS(msg);
+		assertTrue(reponse.equals(PASS_OK));
+		
+		String msg1 = "SKLQKQ";
+		reponse = f.processPASS(msg1);
+		assertTrue(reponse.equals(PASS_ERROR));
+	}
+	
+	@Test
 	public void test_processQUIT() {
-		
-		
-		
+		assertTrue(f.processQUIT().equals(QUIT));
 	}
 
 }
