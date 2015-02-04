@@ -20,6 +20,7 @@ public class ServeurTest{
 	}
 
 
+
 	@Test
 	public void test_load_map_user() throws IOException {
 		String filename = "Data/Test/test_load_map_user.txt";
@@ -37,5 +38,6 @@ public class ServeurTest{
 		assertTrue("321".equals(hm.get("EMILIEN"))); 
 		assertTrue(null == hm.get("AZERTY"));	
 	}
+
 
 }
