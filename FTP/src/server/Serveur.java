@@ -1,13 +1,8 @@
 package server;
 
-import static util.Messages.*;
-
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -40,20 +35,11 @@ public class Serveur {
 	
 	public static void main(String[] args) throws IOException {
 		Serveur serveur = new Serveur(4000);
-		String message = new String();
 		//Boolean active = true;
 		while (true) {
 			Socket connexion = serveur.socket.accept();
-			InputStream is = connexion.getInputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); // TODO mettre seulement en 1ere connexion
-			out.writeBytes(SERVEUR_SERVICE_READY);
-			while ((message = br.readLine()) != null) {
-				FtpRequest requete = new FtpRequest(connexion,message,serveur.map_user);
-				requete.processRequest(message);
-				//active = requete.active;
-			}
-			connexion.close();
+			FtpRequest requete = new FtpRequest(connexion, serveur.map_user);
+			requete.start();
 		}
 
 	}

@@ -2,8 +2,11 @@ package server;
 
 import static util.Messages.*;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 
@@ -12,7 +15,7 @@ public class FtpRequest extends Thread {
 	protected Socket connexion;
 	protected String msg;
 	protected String user ;
-	protected Serveur s;
+	protected Serveur serveur;
 	protected Boolean active;
 	private HashMap<String, String> map;
 	
@@ -20,13 +23,11 @@ public class FtpRequest extends Thread {
 	
 	
 	
-	public FtpRequest(Socket connexion, String msg, HashMap<String, String> map) {
-		this.connexion = connexion;
-		this.msg = msg;
+	public FtpRequest( Socket connexion, HashMap<String, String> map) {
 		this.user = "";
 		this.map = map;
 		this.active = true;
-		
+		this.connexion = connexion;
 	}	
 	
 	public void processRequest(String msg) throws IOException {
@@ -38,11 +39,13 @@ public class FtpRequest extends Thread {
 		{
 			case "USER":
 				rep = processUSER(tmp[1]);
-				System.out.println(rep);
 				break;
 			case "QUIT":
 				rep = processQUIT(); 
 				this.active = false;
+				break;
+			case "PASS" :
+				rep = processPASS(tmp[1]);
 				break;
 			default:
 				rep = "111 error\n";
@@ -98,6 +101,20 @@ public class FtpRequest extends Thread {
 	}
 	public void run()
 	{
-		
+		String message = new String();
+		try { //TODO la gestion des exceptions
+			InputStream is = connexion.getInputStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); // TODO mettre seulement en 1ere connexion
+			out.writeBytes(SERVEUR_SERVICE_READY);
+			while ((message = br.readLine()) != null) {
+				this.processRequest(message);
+				//active = requete.active;
+			}
+			connexion.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
