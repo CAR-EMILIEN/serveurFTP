@@ -4,6 +4,7 @@ import static util.Messages.*;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,10 +48,13 @@ public class FtpRequest extends Thread {
 			case "PASS" :
 				rep = processPASS(tmp[1]);
 				break;
+			case "LIST" :
+				rep = processLIST();
+				break;
 			default:
 				rep = "111 error\n";
 		}
-		System.out.println(rep +"1");
+		System.out.println(rep);
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 		out.writeBytes(rep);
 	}
@@ -89,9 +93,16 @@ public class FtpRequest extends Thread {
 	{
 		return "";
 	}
-	public String processLIST(String msg)
+	
+	//TODO gérer deuxieme socket
+	public String processLIST()
 	{
-		return "";
+		String list = "";
+		String[] files = new File(".").list();
+		for (int i = 0; i < files.length; i++)
+			list += files[i] + " ;";
+		list += "\n";
+		return list;
 	}
 	public String processQUIT()
 	{
@@ -105,7 +116,7 @@ public class FtpRequest extends Thread {
 		try { //TODO la gestion des exceptions
 			InputStream is = connexion.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); // TODO mettre seulement en 1ere connexion
+			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 			out.writeBytes(SERVEUR_SERVICE_READY);
 			while ((message = br.readLine()) != null) {
 				this.processRequest(message);
