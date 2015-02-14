@@ -36,10 +36,13 @@ public class Serveur {
 	public static void main(String[] args) throws IOException {
 		Serveur serveur = new Serveur(4000);
 		//Boolean active = true;
+		System.out.println("Demarrage du serveur");
+		System.out.println("En attente de connexion\n");
 		while (true) {
 			Socket connexion = serveur.socket.accept();
 			FtpRequest requete = new FtpRequest(connexion, serveur.map_user);
 			requete.start();
+			System.out.println("nouveau client ");
 		}
 
 	}
@@ -62,9 +65,9 @@ public class Serveur {
 		BufferedReader br = new BufferedReader(f);
 		while((s = br.readLine())!=null)
 		{
-			System.out.println(s);
+			//System.out.println(s);
 			tab = s.split(" ");
-			System.out.println(tab[1]);
+			//System.out.println(tab[1]);
 			this.map_user.put(tab[0], tab[1]);
 		}
 		br.close();

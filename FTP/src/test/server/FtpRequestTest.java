@@ -18,7 +18,7 @@ public class FtpRequestTest {
 		String msg_init = "USER TOTO";
 		HashMap<String,String> hm = new HashMap<>();
 		hm.put("TOTO", "963");
-		f = new FtpRequest(null, msg_init, hm);
+		f = new FtpRequest(null,msg_init,hm);
 	}
 
 	@Test
@@ -32,7 +32,7 @@ public class FtpRequestTest {
 		msg = "ARTT";
 		reponse = f.processUSER(msg);
 		assertFalse(reponse.equals(USER_OK));
-		assertTrue(reponse.equals(USER_NEED_ACCOUNT));
+		assertTrue(reponse.equals(USER_INVALID));
 		
 	}
 	
@@ -48,6 +48,13 @@ public class FtpRequestTest {
 		String msg1 = "SKLQKQ";
 		reponse = f.processPASS(msg1);
 		assertTrue(reponse.equals(PASS_ERROR));
+	}
+	
+	@Test
+	public void test_processLIST(){
+		String msg = "";
+			
+		
 	}
 	
 	@Test

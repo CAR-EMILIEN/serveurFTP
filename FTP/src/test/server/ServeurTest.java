@@ -2,16 +2,13 @@ package test.server;
 
 import static org.junit.Assert.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import server.FtpRequest;
 import server.Serveur;
 
 public class ServeurTest{

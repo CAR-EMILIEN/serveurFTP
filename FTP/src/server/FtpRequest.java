@@ -21,7 +21,13 @@ public class FtpRequest extends Thread {
 	private HashMap<String, String> map;
 	
 	
-	
+	public FtpRequest( Socket connexion,String msg, HashMap<String, String> map) {
+		this.user = "";
+		this.map = map;
+		this.msg = msg;
+		this.active = true;
+		this.connexion = connexion;
+	}	
 	
 	
 	public FtpRequest( Socket connexion, HashMap<String, String> map) {
@@ -35,6 +41,7 @@ public class FtpRequest extends Thread {
 		String rep = "";
 		String[] tmp = null;
 		
+		System.out.println(msg);
 		tmp = msg.split(" ",2);
 		switch(tmp[0])
 		{
@@ -45,11 +52,14 @@ public class FtpRequest extends Thread {
 				rep = processQUIT(); 
 				this.active = false;
 				break;
-			case "PASS" :
+			case "PASS":
 				rep = processPASS(tmp[1]);
 				break;
-			case "LIST" :
-				rep = processLIST();
+			case "SYST":
+				rep = processSYST();
+				break;
+			case "LIST":
+				rep = processLIST(tmp[1]);
 				break;
 			default:
 				rep = "111 error\n";
@@ -68,7 +78,7 @@ public class FtpRequest extends Thread {
 			this.user = msg;
 		}
 		else
-			rep = USER_NEED_ACCOUNT ;
+			rep = USER_INVALID;
 		return rep;
 	}
 	
@@ -84,6 +94,11 @@ public class FtpRequest extends Thread {
 		return rep;		
 	}	
 	
+	public String processSYST()
+	{
+		return "UNIX Type: L8\n";
+	}
+	
 	public String processRETR(String msg)
 	{
 		return "";
@@ -95,9 +110,9 @@ public class FtpRequest extends Thread {
 	}
 	
 	//TODO gérer deuxieme socket
-	public String processLIST()
+	public String processLIST(String msg)
 	{
-		String list = "";
+		String list = msg;
 		String[] files = new File(".").list();
 		for (int i = 0; i < files.length; i++)
 			list += files[i] + " ;";
