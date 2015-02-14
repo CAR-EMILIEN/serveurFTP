@@ -47,7 +47,7 @@ public class FtpRequestTest {
 		
 		String msg1 = "SKLQKQ";
 		reponse = f.processPASS(msg1);
-		assertTrue(reponse.equals(PASS_ERROR));
+		assertTrue(reponse.equals(NOT_LOGGED_IN));
 	}
 	
 	@Test

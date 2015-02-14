@@ -24,7 +24,8 @@ public class FtpRequest extends Thread {
 	protected String client_dpt_addr;
 	protected int client_dpt_port;
 	
-	
+	protected String current_dir;
+	protected Socket socket_tmp;
 	
 	
 	public FtpRequest( Socket connexion, HashMap<String, String> map) {
@@ -32,10 +33,11 @@ public class FtpRequest extends Thread {
 		this.map = map;
 		this.active = true;
 		this.connexion = connexion;
+		this.current_dir = "Data/FTP_ressources";
 	}	
 	
 	public FtpRequest( Socket connexion,String msg, HashMap<String, String> map) {
-		super(connexion,map);
+		this(connexion,map);
 		this.msg = msg;
 	}	
 	
@@ -64,11 +66,11 @@ public class FtpRequest extends Thread {
 			case "PORT":
 				rep = processPORT(tmp[1]);
 				break;
-			case "NLST":
+			case "LIST":
+				String arg = ".";
 				if (tmp.length>1)
-					rep = processNLST(tmp[1]);
-				else
-					rep = processNLST("");
+					arg = tmp[1];
+				rep = processLIST(arg);
 				break;
 			default:
 				rep = "111 error\n";
@@ -116,9 +118,13 @@ public class FtpRequest extends Thread {
 		if (tmp.length==6)
 		{
 			String addr = tmp[0]+"."+tmp[1]+"."+tmp[2]+"."+tmp[3];
-			String port = tmp[4]+tmp[5];
+			int port1 = Integer.parseInt(tmp[4]);
+			int port2 = Integer.parseInt(tmp[5]);
+			String port1s = Integer.toHexString(port1);
+			String port2s = Integer.toHexString(port2);
+			
 			this.client_dpt_addr = addr;
-			this.client_dpt_port=Integer.parseInt(port);
+			this.client_dpt_port=Integer.parseInt(port1s+port2s,16);
 			rep = SUCCESS;
 			System.out.println(this.client_dpt_addr);
 			System.out.println(this.client_dpt_port);
@@ -139,11 +145,12 @@ public class FtpRequest extends Thread {
 		return "";
 	}
 	
-	//TODO gérer deuxieme socket
-	public String processNLST(String msg)
+	
+	public String processLIST(String msg) throws UnknownHostException, IOException
 	{
+		String current_dir = this.current_dir +"/"+ msg;
 		String list = msg;
-		String[] files = new File(".").list();
+		String[] files = new File(current_dir).list();
 		for (int i = 0; i < files.length; i++)
 			list += files[i] + " ;";
 		list += "\n";
@@ -158,12 +165,14 @@ public class FtpRequest extends Thread {
 	
 	public String send_to_dtp(String data) throws UnknownHostException, IOException
 	{
-		Socket s = new Socket(this.client_dpt_addr,this.client_dpt_port);
-		DataOutputStream out = new DataOutputStream(s.getOutputStream()); 
+		System.out.println(this.client_dpt_addr + " : " + this.client_dpt_port);
+		this.socket_tmp = new Socket(this.client_dpt_addr,this.client_dpt_port);
+		System.out.println(this.socket_tmp.getPort());
+		DataOutputStream out = new DataOutputStream(this.socket_tmp.getOutputStream()); 
 		out.writeBytes(data);
-		s.close();
+		socket_tmp.close();
 		
-		return "";
+		return "200 \n";
 	}
 	
 	public void run()
@@ -176,8 +185,10 @@ public class FtpRequest extends Thread {
 			out.writeBytes(SERVEUR_SERVICE_READY);
 			while ((message = br.readLine()) != null) {
 				this.processRequest(message);
-				//active = requete.active;
+				if (!this.active)
+					break;
 			}
+			System.out.println("Fermeture");
 			connexion.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
