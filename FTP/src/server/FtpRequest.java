@@ -147,9 +147,16 @@ public class FtpRequest extends Thread {
 	
 
 	/**
+	* Méthode pour traiter la commande pass
+	* Cette commande suit la commande user, et demande a l'utilisateur si il est autorisé 
+	* à s'identifier avec son mot de passe pour lui permettre d'accéder aux fonctions qui ne sont pas 
+	* read-only (par exemple store et retrieve)
 	*
+	*
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
 	* 
-	* 
+	* @return le code 230 signifiant que l'utilisateur est bien identifié,
+	*         sinon 430 indiquant que le mot de passe etait erroné
 	*/
 	public String processPASS(String msg)
 	{
