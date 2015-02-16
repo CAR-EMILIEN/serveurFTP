@@ -157,9 +157,16 @@ public class FtpRequest extends Thread {
 	
 
 	/**
+	* Méthode pour traiter la commande pass
+	* Cette commande suit la commande user, et demande a l'utilisateur si il est autorisé 
+	* à s'identifier avec son mot de passe pour lui permettre d'accéder aux fonctions qui ne sont pas 
+	* read-only (par exemple store et retrieve)
 	*
+	*
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
 	* 
-	* 
+	* @return le code 230 signifiant que l'utilisateur est bien identifié,
+	*         sinon 430 indiquant que le mot de passe etait erroné
 	*/
 	public String processPASS(String msg)
 	{
@@ -174,12 +181,34 @@ public class FtpRequest extends Thread {
 	}	
 	
 	
+	/**
+	* Méthode pour traiter la commande syst.	
+	* En pratique on renvoi toujours "UNIX Type: L8\n" puisque
+	* on lancera toujours ce programme depuis un OS unix.
+	*
+	* @param void
+	*
+	* @return "UNIX Type: L8 \n"
+	* 
+	*/
 	public String processSYST()
 	{
 		return "UNIX Type: L8\n";
 	}
 	
 	public String processPORT(String msg) throws UnknownHostException, IOException
+	/**
+	* Méthode pour traiter la commande port
+	* Cette commande sert au client-Ftp à spécifier une adresse ip et un 
+	* port pour que le serveur ouvre une connexion avec lui pour des échanges de données.
+	*	
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp
+	*
+	* @return 200 pour succès,
+	*         sinon 520 pour les fautes de syntaxe dans la commande
+	*
+	*
+	*/
 	{	
 		String rep = "";
 		String[] tmp = msg.split(",");
@@ -216,6 +245,20 @@ public class FtpRequest extends Thread {
 	public String infoFile() {
 		String current_dir = this.current_dir +"/";
 		String list = "";
+	
+	/**
+	*
+	* Méthode pour traiter la commande list
+	* 
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
+	*
+	* @return 
+	*
+	*/
+	public String processLIST(String msg) throws UnknownHostException, IOException
+	{
+		String current_dir = this.current_dir +"/"+ msg;
+		String list = msg;
 		String[] files = new File(current_dir).list();
 		for (int i = 0; i < files.length; i++)
 			list += files[i] + " ;";
@@ -232,6 +275,15 @@ public class FtpRequest extends Thread {
 		
 	}
 
+	/**
+	*
+	* Méthode  pour traiter la commande quit
+	* 
+	* @param void
+	*
+	* @return le code 221
+	*	
+	*/
 	public String processQUIT()
 	{
 		String rep = "";
