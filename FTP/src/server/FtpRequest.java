@@ -30,9 +30,12 @@ public class FtpRequest extends Thread {
 	
 	protected String client_dpt_addr;
 	protected int client_dpt_port;
+	protected Socket client_socket = null;
+	protected boolean client_active = false;
 	
 	protected String current_dir;
-	protected Socket socket_tmp;
+	private String client_files;
+	//protected Socket socket_tmp;
 	
 	/**
 	*
@@ -118,6 +121,13 @@ public class FtpRequest extends Thread {
 		System.out.println(rep);
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 		out.writeBytes(rep);
+		if (client_active) {
+			//String file = this.infoFile();
+			send_to_dtp(this.client_files);
+			out.writeBytes("200\r\n");
+			this.client_active = false;
+			this.client_socket = null;
+		}
 	}
 	
 	/**
@@ -169,7 +179,7 @@ public class FtpRequest extends Thread {
 		return "UNIX Type: L8\n";
 	}
 	
-	public String processPORT(String msg)
+	public String processPORT(String msg) throws UnknownHostException, IOException
 	{	
 		String rep = "";
 		String[] tmp = msg.split(",");
@@ -202,18 +212,26 @@ public class FtpRequest extends Thread {
 	{
 		return "";
 	}
-	
-	
-	public String processLIST(String msg) throws UnknownHostException, IOException
-	{
-		String current_dir = this.current_dir +"/"+ msg;
-		String list = msg;
+
+	public String infoFile() {
+		String current_dir = this.current_dir +"/";
+		String list = "";
 		String[] files = new File(current_dir).list();
 		for (int i = 0; i < files.length; i++)
 			list += files[i] + " ;";
-		list += "\n";
-		return send_to_dtp(list);
+		return list;
 	}
+	
+	public String processLIST(String msg) throws UnknownHostException, IOException
+	{
+
+		//return send_to_dtp(list);
+		this.client_active = true;
+		this.client_files = infoFile();
+		return "150 About to read directory content!\r\n";
+		
+	}
+
 	public String processQUIT()
 	{
 		String rep = "";
@@ -224,13 +242,22 @@ public class FtpRequest extends Thread {
 	public String send_to_dtp(String data) throws UnknownHostException, IOException
 	{
 		System.out.println(this.client_dpt_addr + " : " + this.client_dpt_port);
-		this.socket_tmp = new Socket(this.client_dpt_addr,this.client_dpt_port);
+		/*this.socket_tmp = new Socket(this.client_dpt_addr,this.client_dpt_port);
 		System.out.println(this.socket_tmp.getPort());
-		DataOutputStream out = new DataOutputStream(this.socket_tmp.getOutputStream()); 
-		out.writeBytes(data);
+		DataOutputStream out2 = new DataOutputStream(this.socket_tmp.getOutputStream()); 
+		out2.writeBytes(data);
+		System.out.println(
+				data);
 		socket_tmp.close();
-		
-		return "200 \n";
+		*/
+		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
+		System.out.println(this.client_socket.getPort());
+		DataOutputStream out2 = new DataOutputStream(this.client_socket.getOutputStream()); 
+		out2.writeBytes(data);
+		System.out.println(data);
+		out2.close();
+		this.client_socket.close();
+		return "200 \r\n";
 	}
 	
 	public void run()
