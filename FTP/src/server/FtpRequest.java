@@ -245,6 +245,11 @@ public class FtpRequest extends Thread {
 	public String infoFile() {
 		String current_dir = this.current_dir +"/";
 		String list = "";
+		String[] files = new File(current_dir).list();
+		for (int i = 0; i < files.length; i++)
+			list += files[i] + " ;";
+		return list;
+	}
 	
 	/**
 	*
@@ -255,15 +260,6 @@ public class FtpRequest extends Thread {
 	* @return 
 	*
 	*/
-	public String processLIST(String msg) throws UnknownHostException, IOException
-	{
-		String current_dir = this.current_dir +"/"+ msg;
-		String list = msg;
-		String[] files = new File(current_dir).list();
-		for (int i = 0; i < files.length; i++)
-			list += files[i] + " ;";
-		return list;
-	}
 	
 	public String processLIST(String msg) throws UnknownHostException, IOException
 	{
