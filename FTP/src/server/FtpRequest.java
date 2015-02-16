@@ -1,4 +1,4 @@
- package server;
+package server;
 
 import static util.Messages.*;
 
@@ -11,6 +11,13 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+
+
+/**
+*
+* La classe qui  gére l'échange avec un client FTP
+*
+*/
 
 public class FtpRequest extends Thread {
 	
@@ -27,7 +34,17 @@ public class FtpRequest extends Thread {
 	protected String current_dir;
 	protected Socket socket_tmp;
 	
-	
+	/**
+	*
+	* Le constructeur pour FtpRequest
+	*
+	*
+	* @param connexion la Socket par lequelle on communique les commandes avec le client Ftp
+	* @param map Une HashMap contenant des paires username:password des utilisateurs connus du serveur Ftp
+	*
+	* @return 
+	*/ 	
+
 	public FtpRequest( Socket connexion, HashMap<String, String> map) {
 		this.user = "";
 		this.map = map;
@@ -36,12 +53,35 @@ public class FtpRequest extends Thread {
 		this.current_dir = "Data/FTP_ressources";
 	}	
 	
+	/**
+	*
+	* Le constructeur pour FtpRequest 
+	*
+	*
+	* @param connexion la Socket par lequelle on communique les commandes avec le client Ftp
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp
+	* @param map Une HashMap contenant des paires username:password des utilisateurs connus du serveur Ftp
+	*
+	* @return 
+	*
+	* 	
+	*/
 	public FtpRequest( Socket connexion,String msg, HashMap<String, String> map) {
 		this(connexion,map);
 		this.msg = msg;
 	}	
 	
 	
+	/**
+	*	
+	* Méthode centrale de traitement des messages Ftp.
+	* Elle reçoit des commandes de la part du user-pi et lui renvoi les messages correspondants.
+	* 
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp et qui va être traité
+	* 
+	* @return void Ne retourne pas de valeur, mais écrit sur le Stream du client Ftp connecté. 
+	* 
+	*/	 
 	public void processRequest(String msg) throws IOException {
 		String rep = "";
 		String[] tmp = null;
@@ -80,6 +120,18 @@ public class FtpRequest extends Thread {
 		out.writeBytes(rep);
 	}
 	
+	/**
+	* Méthode pour traiter la commande user.
+	* Si l'utilisateur fais partie des utilisateurs autorisés,
+	* alors cette méthode renvoi le code 331 pour signaler qu'il doit maintenant
+	* rentrer son mot de passe. Si en revanche il ne fait pas partie des
+	* utilisateurs autorisés on renvoi un  code 430
+	* 
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter.
+	*
+	* @return le code 331 en cas de succés pour indiquer a l'utilisateur de donner son mot de passe
+        *         sinon le code 430 indiquant un nom d'utilisateur incorrect 
+	*/
 	public String processUSER(String msg){
 		String rep = "";
 		//System.out.println(msg);
@@ -93,6 +145,12 @@ public class FtpRequest extends Thread {
 		return rep;
 	}
 	
+
+	/**
+	*
+	* 
+	* 
+	*/
 	public String processPASS(String msg)
 	{
 		String rep = "";
