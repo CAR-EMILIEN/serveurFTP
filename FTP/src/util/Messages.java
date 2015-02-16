@@ -24,7 +24,8 @@ public class Messages {
 	public static final String NOT_LOGGED_IN = "530 Not logged in.\n";
 	
 	public static final String QUIT = "221\n";
-        public static final String SYNTAX_ERROR = "520 \n";
+	public static final String SUCCESS = "200 command okay\n";
+    public static final String SYNTAX_ERROR = "520 \n";
      
 
 	public static final String toto = "";		
