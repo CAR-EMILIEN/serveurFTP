@@ -171,11 +171,33 @@ public class FtpRequest extends Thread {
 	}	
 	
 	
+	/**
+	* Méthode pour traiter la commande syst.	
+	* En pratique on renvoi toujours "UNIX Type: L8\n" puisque
+	* on lancera toujours ce programme depuis un OS unix.
+	*
+	* @param void
+	*
+	* @return "UNIX Type: L8 \n"
+	* 
+	*/
 	public String processSYST()
 	{
 		return "UNIX Type: L8\n";
 	}
 	
+	/**
+	* Méthode pour traiter la commande port
+	* Cette commande sert au client-Ftp à spécifier une adresse ip et un 
+	* port pour que le serveur ouvre une connexion avec lui pour des échanges de données.
+	*	
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp
+	*
+	* @return 200 pour succès,
+	*         sinon 520 pour les fautes de syntaxe dans la commande
+	*
+	*
+	*/
 	public String processPORT(String msg)
 	{	
 		String rep = "";
@@ -210,7 +232,15 @@ public class FtpRequest extends Thread {
 		return "";
 	}
 	
-	
+	/**
+	*
+	* Méthode pour traiter la commande list
+	* 
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
+	*
+	* @return 
+	*
+	*/
 	public String processLIST(String msg) throws UnknownHostException, IOException
 	{
 		String current_dir = this.current_dir +"/"+ msg;
@@ -221,6 +251,15 @@ public class FtpRequest extends Thread {
 		list += "\n";
 		return send_to_dtp(list);
 	}
+	/**
+	*
+	* Méthode  pour traiter la commande quit
+	* 
+	* @param void
+	*
+	* @return le code 221
+	*	
+	*/
 	public String processQUIT()
 	{
 		String rep = "";
