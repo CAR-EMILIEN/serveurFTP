@@ -60,7 +60,7 @@ public class FtpRequest extends Thread {
 		this.map = map;
 		this.active = true;
 		this.connexion = connexion;
-		this.current_dir = "FTP/Data/FTP_ressources";
+		this.current_dir = "Data/FTP_ressources";
 	}	/**
 	 * 
 	 * Le constructeur pour FtpRequest (surtout utilisé pour les tests
@@ -300,13 +300,12 @@ public class FtpRequest extends Thread {
 	public String infoFile(String path) throws IOException,InterruptedException { 
 		File dir = new File(this.current_dir + "/" + path);
 		if (!dir.isFile())
-			return "error"+path; // TODO
+			return "error"+this.current_dir+"/"+path; // TODO
 		String cmd = "ls -l " + this.current_dir + "/" + path;
 		String content = "";
 		Process p = Runtime.getRuntime().exec(cmd);
 		p.waitFor();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				p.getInputStream()));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String line = reader.readLine();
 		while (line != null) {
 			System.out.println(line);
