@@ -37,7 +37,7 @@ public class FtpRequest extends Thread {
 	protected String current_dir;
 	private String client_files;
 	private boolean client_storing = false;
-	private int BLOC_SIZE = 100;
+	private final int BLOC_SIZE = 1024;
 
 
 	/**
@@ -366,7 +366,17 @@ public class FtpRequest extends Thread {
 		rep = QUIT;
 		return rep;
 	}
-
+	
+	/**
+	* Méthode pour envoyer des données à l'adresse et au port spécifié par le client par la
+	* connexion qui sert à transférer des données.
+	* 
+	* @param data Les données a envoyer au client_dtp
+	* 
+	* @throws UnknownHostException
+	* @throws IOException 
+	*
+	*/
 	public String send_to_dtp(String data) throws UnknownHostException,IOException {
 		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
 		DataOutputStream out2 = new DataOutputStream(this.client_socket.getOutputStream());
@@ -375,7 +385,17 @@ public class FtpRequest extends Thread {
 		this.client_socket.close();
 		return SUCCESS;
 	}
-
+	
+	/**
+	* Méthodes pour envoyer un fichier à l'adresse et au port spécifié par le client par la
+	* connexion qui sert à transférer des données.
+	* 
+	* @param pathfile chemin vers un fichier/dossier
+	* 
+	* @throws UnknownHostException
+	* @throws IOException 
+	*
+	*/
 	public String send_file(String pathfile) throws UnknownHostException, IOException {
 		File f = new File(this.current_dir+"/"+pathfile);
 		this.client_socket = new Socket(this.client_dpt_addr, this.client_dpt_port);
@@ -391,7 +411,11 @@ public class FtpRequest extends Thread {
 		this.client_socket.close();
 		return STORE_OK;
 	}
-
+	
+	/**
+	* Méthode appelé par Thread.start().
+	*
+	*/
 	public void run() {
 		String message = new String();
 

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  * 
- * Classe gérant le serveur FTP.
+ * Classe créant des instances
  * 
  * @author Rousé & Allart
  */
@@ -47,12 +47,13 @@ public class Serveur {
 
 	}
 	/**
-	 * read into the file containing authorized user and load them into a HashMap 
+	 * Lit dans le fichier contenant les utilisateurs autorisé, et les
+	 * chargent dans une HashMap 
 	 * 
-	 * @param  filename the file to open and to load into the HashMap
+	 * @param  filename le fichier a charger dans la hashmap
 	 * @return void 
 	 * 
-	 * @sideeffect fill map_user with users and their password
+	 * @sideeffect rempli la map
 	 * 
 	 * 		
 	 * @throws IOException
