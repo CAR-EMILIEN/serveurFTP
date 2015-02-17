@@ -125,7 +125,7 @@ public class FtpRequest extends Thread {
 				rep = processPORT(tmp[1]);
 				break;
 			case "LIST":
-				String arg = ".";
+				String arg = "";
 				if (tmp.length>1)
 					arg = tmp[1];
 				rep = processLIST(arg);
@@ -297,11 +297,19 @@ public class FtpRequest extends Thread {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public String infoFile(String path) throws IOException,InterruptedException { 
-		File dir = new File(this.current_dir + "/" + path);
-		if (!dir.isFile())
-			return "error"+this.current_dir+"/"+path; // TODO
-		String cmd = "ls -l " + this.current_dir + "/" + path;
+	public String infoFile(String path) throws IOException,InterruptedException {
+		String pathRep = "";
+		File dir = null;
+		if (path == "") {
+			pathRep = "";
+			dir = new File(this.current_dir);
+		} else {
+			pathRep = this.current_dir + "/" + path;
+			dir = new File(pathRep);
+		}
+		if (!dir.isFile() && !dir.isDirectory())
+			return ABORTED_LOCAL_ERROR; 
+		String cmd = "ls -l " + pathRep;
 		String content = "";
 		Process p = Runtime.getRuntime().exec(cmd);
 		p.waitFor();
