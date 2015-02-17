@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,7 @@ public class FtpRequest extends Thread {
 
 	protected String current_dir;
 	private String client_files;
+	private boolean client_retrieving = false;
 	private boolean client_storing = false;
 	private final int BLOC_SIZE = 1024;
 
@@ -138,7 +140,10 @@ public class FtpRequest extends Thread {
 				rep = processSTOR(tmp[1]);
 				break;
 			case "RETR":
-				
+				rep = processRETR(tmp[1]);
+				if (!rep.equals("451 The file cannot be found on the server\r\n"))
+					this.client_retrieving = true;
+				break;
 			default:
 				rep = NOT_IMPLEMENTED;
 		}
@@ -146,17 +151,22 @@ public class FtpRequest extends Thread {
 
 		out.writeBytes(rep);
 		if (client_active) {
-			// String file = this.infoFile();
-			send_to_dtp(this.client_files);
-			out.writeBytes(SUCCESS);
-			this.client_active = false;
-			this.client_socket = null;
+				send_to_dtp(this.client_files);
+				out.writeBytes(SUCCESS);
+				this.client_active = false;
+				this.client_socket = null;
 		}
 		if (client_storing) {
 			rep = send_file(tmp[1]);
 			out.writeBytes(rep);
 			this.client_storing = false;
 			this.client_socket = null;
+		}
+		if (client_retrieving) {
+			rep = retrieve_file(tmp[1]);
+			this.client_retrieving = false;
+			this.client_socket = null;
+			out.writeBytes(rep);
 		}
 	}
 
@@ -261,8 +271,28 @@ public class FtpRequest extends Thread {
 		return rep;
 	}
 
-	public String processRETR(String msg) {
-		return "";
+	public String processRETR(String file) {
+		File fileToR = new File(this.current_dir+ "/" + file);
+		if (!fileToR.exists()) 
+			return "451 The file cannot be found on the server\r\n";
+		return "150 Going to send the file\r\n";
+	}
+	
+	public String retrieve_file(String file) throws UnknownHostException, IOException{
+		File fileToR = new File(this.current_dir+ "/" + file);
+		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
+		FileInputStream fis = new FileInputStream(fileToR);
+		DataOutputStream cos = new DataOutputStream(this.client_socket.getOutputStream());
+		byte[] buffer = new byte[BLOC_SIZE];
+		int read = 0;
+		while ((read = fis.read(buffer)) > 0) {
+			cos.write(buffer, 0, read);
+		}
+		cos.close();
+		fis.close();
+		this.client_socket.close();
+		return RETRIEVE_OK;
+
 	}
 	
 	/**
@@ -336,12 +366,11 @@ public class FtpRequest extends Thread {
 	 * 
 	 */
 
-	public String processLIST(String msg) throws UnknownHostException,
-			IOException, InterruptedException {
-
-		// return send_to_dtp(list);
-		this.client_active = true;
+	public String processLIST(String msg) throws UnknownHostException,IOException, InterruptedException {
 		this.client_files = infoFile(msg);
+		if (this.client_files.equals(ABORTED_LOCAL_ERROR))
+			return ABORTED_LOCAL_ERROR;
+		this.client_active = true;
 		return READING_CONTENT;
 
 	}

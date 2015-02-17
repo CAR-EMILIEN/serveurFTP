@@ -27,7 +27,8 @@ public class Messages {
 	public static final String STORING_READY = "150 File status okay, about to open data connection.\r\n";
 	public static final String STORE_OK = "226 \r\n";
 	public static final String SUCCESS = "220 Tout va bien\n";
-	
+	public static final String NO_CONNECTION = "425 No data connection has been estblished with the client\r\n";
+	public static final String RETRIEVE_OK = "226 The file was succesfully sent!\r\n";
 	
 	public static final String QUIT = "221 \n";
 	public static final String SYNTAX_ERROR = "520 \n";
