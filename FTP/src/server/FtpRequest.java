@@ -241,7 +241,7 @@ public class FtpRequest extends Thread {
 	{
 		return "";
 	}
-
+	
 	public String infoFile() {
 		String current_dir = this.current_dir +"/";
 		String list = "";
