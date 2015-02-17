@@ -3,6 +3,8 @@ package test.server;
 import static util.Messages.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import org.junit.Before;
@@ -51,9 +53,41 @@ public class FtpRequestTest {
 	}
 	
 	@Test
-	public void test_processLIST(){
+	public void test_processLIST() throws UnknownHostException, IOException, InterruptedException{
 		String msg = "";
+		String rep = f.processLIST(msg);
 			
+		assertTrue(rep.equals(READING_CONTENT));	
+		
+		msg = "toto.txt";
+		rep = f.processLIST(msg);
+		
+		assertTrue(rep.equals(READING_CONTENT));
+		
+		msg = "skdqskdmqlskdmqlskdmqlskdmqlskmqlkmqlksdmqlskmqlkdmqlskdmqlkdm";
+		rep = f.processLIST(msg);
+	
+		assertTrue(rep.equals(ABORTED_LOCAL_ERROR));
+			
+	}
+	
+	@Test
+	public void test_processPORT() throws UnknownHostException, IOException {
+		String msg = "";
+		String rep = f.processPORT(msg);
+		
+		assertTrue(rep.equals(SYNTAX_ERROR));
+		
+		msg = "127,0,0,1,231,25";
+		rep = f.processPORT(msg);
+		
+		assertTrue(rep.equals(SUCCESS));
+		
+		msg = "skdfmlkd";
+		rep = f.processPORT(msg);
+		
+		assertTrue(rep.equals(SYNTAX_ERROR));
+		
 		
 	}
 	
