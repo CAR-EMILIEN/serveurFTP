@@ -37,7 +37,7 @@ public class FtpRequest extends Thread {
 	protected String current_dir;
 	private String client_files;
 	private boolean client_storing = false;
-	private int BLOC_SIZE = 100;
+	private final int BLOC_SIZE = 1024;
 
 
 	/**
