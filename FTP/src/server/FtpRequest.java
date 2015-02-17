@@ -245,7 +245,7 @@ public class FtpRequest extends Thread {
 		return "";
 	}
 
-	public String infoFile() {
+	public String infoFile() { //TODO exec(ls)
 		String current_dir = this.current_dir +"/";
 		String list = "";
 		String[] files = new File(current_dir).list();
@@ -270,21 +270,21 @@ public class FtpRequest extends Thread {
 		//return send_to_dtp(list);
 		this.client_active = true;
 		this.client_files = infoFile();
-		return "150 About to read directory content!\r\n";
+		return READING_CONTENT;
 		
 	}
 	
 	/**
 	*
 	* Méthode pour traiter la commande pwd
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
+	* @param 
 	*
 	* @return 
 	*
 	*/
 	
 	public String processPWD() {
-		return "257 " + this.current_dir + "\n";
+		return "257 " + this.current_dir + "\r\n";
 	}
 
 	/**
@@ -306,14 +306,6 @@ public class FtpRequest extends Thread {
 	public String send_to_dtp(String data) throws UnknownHostException, IOException
 	{
 		System.out.println(this.client_dpt_addr + " : " + this.client_dpt_port);
-		/*this.socket_tmp = new Socket(this.client_dpt_addr,this.client_dpt_port);
-		System.out.println(this.socket_tmp.getPort());
-		DataOutputStream out2 = new DataOutputStream(this.socket_tmp.getOutputStream()); 
-		out2.writeBytes(data);
-		System.out.println(
-				data);
-		socket_tmp.close();
-		*/
 		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
 		System.out.println(this.client_socket.getPort());
 		DataOutputStream out2 = new DataOutputStream(this.client_socket.getOutputStream()); 
