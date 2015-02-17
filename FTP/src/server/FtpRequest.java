@@ -115,8 +115,11 @@ public class FtpRequest extends Thread {
 					arg = tmp[1];
 				rep = processLIST(arg);
 				break;
+			case "PWD":
+				rep = processPWD();
+				break;
 			default:
-				rep = "111 error\n";
+				rep = NOT_IMPLEMENTED;
 		}
 		System.out.println(rep);
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
@@ -247,7 +250,7 @@ public class FtpRequest extends Thread {
 		String list = "";
 		String[] files = new File(current_dir).list();
 		for (int i = 0; i < files.length; i++)
-			list += files[i] + " ;";
+			list += files[i] + "\n";
 		return list;
 	}
 	
@@ -269,6 +272,19 @@ public class FtpRequest extends Thread {
 		this.client_files = infoFile();
 		return "150 About to read directory content!\r\n";
 		
+	}
+	
+	/**
+	*
+	* Méthode pour traiter la commande pwd
+	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
+	*
+	* @return 
+	*
+	*/
+	
+	public String processPWD() {
+		return "257 " + this.current_dir + "\n";
 	}
 
 	/**

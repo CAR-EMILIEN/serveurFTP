@@ -22,6 +22,7 @@ public class Messages {
 	
 	public static final String PASS_OK = "230 User logged in, proceed. Logged out if appropriate.\n";
 	public static final String NOT_LOGGED_IN = "530 Not logged in.\n";
+	public static final String NOT_IMPLEMENTED = "111 Not implemented.\n";
 	
 	public static final String SUCCESS = "220 tout va bien\n";
 	
