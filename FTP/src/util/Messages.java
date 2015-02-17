@@ -24,8 +24,10 @@ public class Messages {
 	public static final String NOT_LOGGED_IN = "530 Not logged in.\n";
 	public static final String NOT_IMPLEMENTED = "111 Not implemented.\n";
 	public static final String READING_CONTENT = "150 About to read directory content!\r\n";
-	
+	public static final String STORING_READY = "150 File status okay, about to open data connection.\r\n";
+	public static final String STORE_OK = "226 \r\n";
 	public static final String SUCCESS = "220 Tout va bien\n";
+	
 	
 	public static final String QUIT = "221 \n";
 	public static final String SYNTAX_ERROR = "520 \n";

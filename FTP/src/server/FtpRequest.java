@@ -3,8 +3,10 @@ package server;
 import static util.Messages.*;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +36,8 @@ public class FtpRequest extends Thread {
 
 	protected String current_dir;
 	private String client_files;
+	private boolean client_storing = false;
+	private int BLOC_SIZE = 100;
 
 
 	/**
@@ -125,10 +129,16 @@ public class FtpRequest extends Thread {
 				if (tmp.length>1)
 					arg = tmp[1];
 				rep = processLIST(arg);
+				this.client_active = true;
 				break;
 			case "PWD":
 				rep = processPWD();
 				break;
+			case "STORE":
+				rep = processSTOR(tmp[1]);
+				break;
+			case "RETR":
+				
 			default:
 				rep = NOT_IMPLEMENTED;
 		}
@@ -138,8 +148,14 @@ public class FtpRequest extends Thread {
 		if (client_active) {
 			// String file = this.infoFile();
 			send_to_dtp(this.client_files);
-			out.writeBytes("200\r\n");
+			out.writeBytes(SUCCESS);
 			this.client_active = false;
+			this.client_socket = null;
+		}
+		if (client_storing) {
+			rep = send_file(tmp[1]);
+			out.writeBytes(rep);
+			this.client_storing = false;
 			this.client_socket = null;
 		}
 	}
@@ -204,8 +220,7 @@ public class FtpRequest extends Thread {
 	 * 
 	 */
 	public String processSYST() {
-		return "UNIX Type: L8\n";
-
+		return "UNIX Type: L8\r\n";
 	}
 
 	/**
@@ -249,24 +264,29 @@ public class FtpRequest extends Thread {
 	public String processRETR(String msg) {
 		return "";
 	}
-
-	public String processSTOR(String msg) {
-		return "";
-	}
-<<<<<<< HEAD
 	
-/*	public String infoFile() {
-		String current_dir = this.current_dir +"/";
-		String list = "";
-		String[] files = new File(current_dir).list();
-		for (int i = 0; i < files.length; i++)
-			list += files[i] + " ;";
-		return list;
-*/
+	/**
+	 * 
+	 * Méthode pour traiter la commande stor
+	 * 
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp a traiter.
+	 * 
+	 * @return
+	 * @throws 
+	 * 
+	 */
+	public String processSTOR(String file) {
+		File f = new File(this.current_dir+"/"+file);
+		if (!f.isFile())
+			return ABORTED_LOCAL_ERROR;
+		client_storing = true;
+		return STORING_READY;
+	}
 
-=======
-		
-	/** 
+
+	 /** 
 	 * Donne des informations sur un repertoire/fichier donné.
 	 * (utilise ls)
 	 * 
@@ -277,12 +297,10 @@ public class FtpRequest extends Thread {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
->>>>>>> f2be41aee64a6d01014aa3bbb839780009c0b06e
-	public String infoFile(String path) throws IOException,
-			InterruptedException { 
+	public String infoFile(String path) throws IOException,InterruptedException { 
 		File dir = new File(this.current_dir + "/" + path);
 		if (!dir.isFile())
-			return "error"; // TODO
+			return "error"+path; // TODO
 		String cmd = "ls -l " + this.current_dir + "/" + path;
 		String content = "";
 		Process p = Runtime.getRuntime().exec(cmd);
@@ -350,17 +368,29 @@ public class FtpRequest extends Thread {
 		return rep;
 	}
 
-	public String send_to_dtp(String data) throws UnknownHostException,
-			IOException {
-		this.client_socket = new Socket(this.client_dpt_addr,
-				this.client_dpt_port);
-		DataOutputStream out2 = new DataOutputStream(
-				this.client_socket.getOutputStream());
-
+	public String send_to_dtp(String data) throws UnknownHostException,IOException {
+		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
+		DataOutputStream out2 = new DataOutputStream(this.client_socket.getOutputStream());
 		out2.writeBytes(data);
 		out2.close();
 		this.client_socket.close();
-		return "200 \r\n";
+		return SUCCESS;
+	}
+
+	public String send_file(String pathfile) throws UnknownHostException, IOException {
+		File f = new File(this.current_dir+"/"+pathfile);
+		this.client_socket = new Socket(this.client_dpt_addr, this.client_dpt_port);
+		byte[] buffer = new byte[BLOC_SIZE];
+		DataInputStream dis = new DataInputStream(this.client_socket.getInputStream());
+		FileOutputStream fos = new FileOutputStream(f);
+		int read = 0;
+		while ((read = dis.read(buffer)) > 0) {
+			fos.write(buffer, 0, read);
+		}
+		fos.close();
+		dis.close();
+		this.client_socket.close();
+		return STORE_OK;
 	}
 
 	public void run() {
