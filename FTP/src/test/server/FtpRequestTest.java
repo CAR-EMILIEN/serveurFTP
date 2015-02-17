@@ -53,7 +53,7 @@ public class FtpRequestTest {
 	}
 	
 	@Test
-	public void test_processLIST() throws UnknownHostException, IOException{
+	public void test_processLIST() throws UnknownHostException, IOException, InterruptedException{
 		String msg = "";
 		String rep = f.processLIST(msg);
 			

@@ -12,82 +12,95 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-
 /**
-*
-* La classe qui  gére l'échange avec un client FTP
-*
-*/
+ * 
+ * La classe qui gére l'échange avec un client FTP
+ * 
+ */
 
 public class FtpRequest extends Thread {
-	
+
 	protected Socket connexion;
 	protected String msg;
-	protected String user ;
+	protected String user;
 	protected Serveur serveur;
 	protected Boolean active;
 	private HashMap<String, String> map;
-	
+
 	protected String client_dpt_addr;
 	protected int client_dpt_port;
 	protected Socket client_socket = null;
 	protected boolean client_active = false;
-	
+
 	protected String current_dir;
 	private String client_files;
-	//protected Socket socket_tmp;
-	
-	/**
-	*
-	* Le constructeur pour FtpRequest
-	*
-	*
-	* @param connexion la Socket par lequelle on communique les commandes avec le client Ftp
-	* @param map Une HashMap contenant des paires username:password des utilisateurs connus du serveur Ftp
-	*
-	* @return 
-	*/ 	
 
-	public FtpRequest( Socket connexion, HashMap<String, String> map) {
+	// protected Socket socket_tmp;
+
+	/**
+	 * 
+	 * Le constructeur pour FtpRequest
+	 * 
+	 * 
+	 * @param connexion
+	 *            la Socket par lequelle on communique les commandes avec le
+	 *            client Ftp
+	 * @param map
+	 *            Une HashMap contenant des paires username:password des
+	 *            utilisateurs connus du serveur Ftp
+	 * 
+	 * @return
+	 */
+
+	public FtpRequest(Socket connexion, HashMap<String, String> map) {
 		this.user = "";
 		this.map = map;
 		this.active = true;
 		this.connexion = connexion;
 		this.current_dir = "FTP/Data/FTP_ressources";
-	}	
-	
-	/**
-	*
-	* Le constructeur pour FtpRequest  (surtout utilisé pour les tests
-	*
-	*
-	* @param connexion la Socket par lequelle on communique les commandes avec le client Ftp
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp
-	* @param map Une HashMap contenant des paires username:password des utilisateurs connus du serveur Ftp
-	*
-	* @return 
-	*
-	* 	
-	*/
+	}	/**
+	 * 
+	 * Le constructeur pour FtpRequest (surtout utilisé pour les tests
+	 * 
+	 * 
+	 * @param connexion
+	 *            la Socket par lequelle on communique les commandes avec le
+	 *            client Ftp
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp
+	 * @param map
+	 *            Une HashMap contenant des paires username:password des
+	 *            utilisateurs connus du serveur Ftp
+	 * 
+	 * @return
+	 * 
+	 * 
+	 */
 	public FtpRequest( Socket connexion,String msg, HashMap<String, String> map) {
 		this(connexion,map);
 		this.msg = msg;
-	}	
-	
-	
+	}
+
 	/**
-	*	
-	* Méthode centrale de traitement des messages Ftp.
-	* Elle reçoit des commandes de la part du user-pi et lui renvoi les messages correspondants.
-	* 
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp et qui va être traité
-	* 
-	* @return void Ne retourne pas de valeur, mais écrit sur le Stream du client Ftp connecté. 
-	* 
-	*/	 
-	public void processRequest(String msg) throws IOException {
+	 * 
+	 * Méthode centrale de traitement des messages Ftp. Elle reçoit des
+	 * commandes de la part du user-pi et lui renvoi les messages
+	 * correspondants.
+	 * 
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp et qui va être traité
+	 * 
+	 * @return void Ne retourne pas de valeur, mais écrit sur le Stream du
+	 *         client Ftp connecté.
+	 * @throws InterruptedException
+	 * 
+	 */
+	public void processRequest(String msg) throws IOException, InterruptedException {
 		String rep = "";
 		String[] tmp = null;
+
 		
 		tmp = msg.split(" ",2);
 		switch(tmp[0])
@@ -121,205 +134,225 @@ public class FtpRequest extends Thread {
 				rep = NOT_IMPLEMENTED;
 		}
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
+
 		out.writeBytes(rep);
 		if (client_active) {
-			//String file = this.infoFile();
+			// String file = this.infoFile();
 			send_to_dtp(this.client_files);
 			out.writeBytes("200\r\n");
 			this.client_active = false;
 			this.client_socket = null;
 		}
 	}
-	
+
 	/**
-	* Méthode pour traiter la commande user.
-	* Si l'utilisateur fais partie des utilisateurs autorisés,
-	* alors cette méthode renvoi le code 331 pour signaler qu'il doit maintenant
-	* rentrer son mot de passe. Si en revanche il ne fait pas partie des
-	* utilisateurs autorisés on renvoi un  code 430
-	* 
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter.
-	*
-	* @return le code 331 en cas de succés pour indiquer a l'utilisateur de donner son mot de passe
-        *         sinon le code 430 indiquant un nom d'utilisateur incorrect 
-	*/
-	public String processUSER(String msg){
+	 * Méthode pour traiter la commande user. Si l'utilisateur fais partie des
+	 * utilisateurs autorisés, alors cette méthode renvoi le code 331 pour
+	 * signaler qu'il doit maintenant rentrer son mot de passe. Si en revanche
+	 * il ne fait pas partie des utilisateurs autorisés on renvoi un code 430
+	 * 
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp a traiter.
+	 * 
+	 * @return le code 331 en cas de succés pour indiquer a l'utilisateur de
+	 *         donner son mot de passe sinon le code 430 indiquant un nom
+	 *         d'utilisateur incorrect
+	 */
+	public String processUSER(String msg) {
 		String rep = "";
-		//System.out.println(msg);
-		if(map.containsKey(msg))
-		{
+		// System.out.println(msg);
+		if (map.containsKey(msg)) {
 			rep = USER_OK;
 			this.user = msg;
-		}
-		else
+		} else
 			rep = USER_INVALID;
 		return rep;
 	}
-	
 
 	/**
-	* Méthode pour traiter la commande pass
-	* Cette commande suit la commande user, et demande a l'utilisateur si il est autorisé 
-	* à s'identifier avec son mot de passe pour lui permettre d'accéder aux fonctions qui ne sont pas 
-	* read-only (par exemple store et retrieve)
-	*
-	*
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
-	* 
-	* @return le code 230 signifiant que l'utilisateur est bien identifié,
-	*         sinon 430 indiquant que le mot de passe etait erroné
-	*/
-	public String processPASS(String msg)
-	{
+	 * Méthode pour traiter la commande pass Cette commande suit la commande
+	 * user, et demande a l'utilisateur si il est autorisé à s'identifier avec
+	 * son mot de passe pour lui permettre d'accéder aux fonctions qui ne sont
+	 * pas read-only (par exemple store et retrieve)
+	 * 
+	 * 
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp a traiter.
+	 * 
+	 * @return le code 230 signifiant que l'utilisateur est bien identifié,
+	 *         sinon 430 indiquant que le mot de passe etait erroné
+	 */
+	public String processPASS(String msg) {
 		String rep = "";
-		if(map.get(this.user).equals(msg)){
+		if (map.get(this.user).equals(msg)) {
 			rep = PASS_OK;
-		}
-		else{
+		} else {
 			rep = NOT_LOGGED_IN;
 		}
-		return rep;		
-	}	
-	
-	
+		return rep;
+	}
+
 	/**
-	* Méthode pour traiter la commande syst.	
-	* En pratique on renvoi toujours "UNIX Type: L8\n" puisque
-	* on lancera toujours ce programme depuis un OS unix.
-	*
-	* @param void
-	*
-	* @return "UNIX Type: L8 \n"
-	* 
-	*/
-	public String processSYST()
-	{
+	 * Méthode pour traiter la commande syst. En pratique on renvoi toujours
+	 * "UNIX Type: L8\n" puisque on lancera toujours ce programme depuis un OS
+	 * unix.
+	 * 
+	 * @param void
+	 * 
+	 * @return "UNIX Type: L8 \n"
+	 * 
+	 */
+	public String processSYST() {
 		return "UNIX Type: L8\n";
-	} 
-	
-	
+
+	}
+
 	/**
-	* Méthode pour traiter la commande port
-	* Cette commande sert au client-Ftp à spécifier une adresse ip et un 
-	* port pour que le serveur ouvre une connexion avec lui pour des échanges de données.
-	*	
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp
-	*
-	* @return 200 pour succès,
-	*         sinon 520 pour les fautes de syntaxe dans la commande
-	*
-	*
-	*/
-	public String processPORT(String msg) throws UnknownHostException, IOException
-	
-	{	
+	 * Méthode pour traiter la commande port Cette commande sert au client-Ftp à
+	 * spécifier une adresse ip et un port pour que le serveur ouvre une
+	 * connexion avec lui pour des échanges de données.
+	 * 
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp
+	 * 
+	 * @return 200 pour succès, sinon 520 pour les fautes de syntaxe dans la
+	 *         commande
+	 * 
+	 * 
+	 */
+	public String processPORT(String msg) throws UnknownHostException,
+			IOException
+
+	{
+
 		String rep = "";
 		String[] tmp = msg.split(",");
-		if (tmp.length==6)
-		{
-			String addr = tmp[0]+"."+tmp[1]+"."+tmp[2]+"."+tmp[3];
+		if (tmp.length == 6) {
+			String addr = tmp[0] + "." + tmp[1] + "." + tmp[2] + "." + tmp[3];
 			int port1 = Integer.parseInt(tmp[4]);
 			int port2 = Integer.parseInt(tmp[5]);
 			String port1s = Integer.toHexString(port1);
 			String port2s = Integer.toHexString(port2);
-			
+
 			this.client_dpt_addr = addr;
-			this.client_dpt_port=Integer.parseInt(port1s+port2s,16);
+			this.client_dpt_port = Integer.parseInt(port1s + port2s, 16);
 			rep = SUCCESS;
 			System.out.println(this.client_dpt_addr);
 			System.out.println(this.client_dpt_port);
-		}
-		else
+		} else
 			rep = SYNTAX_ERROR;
 		return rep;
 	}
-	
-	
-	public String processRETR(String msg)
-	{
-		return "";
-	}
-	
-	public String processSTOR(String msg)
-	{
+
+	public String processRETR(String msg) {
 		return "";
 	}
 
-	public String infoFile() { //TODO exec(ls)
-		String current_dir = this.current_dir +"/";
-		String list = "";
-		String[] files = new File(current_dir).list();
-		for (int i = 0; i < files.length; i++)
-			list += files[i] + "\n";
-		return list;
+	public String processSTOR(String msg) {
+		return "";
 	}
-	
+
+	public String infoFile(String path) throws IOException,
+			InterruptedException { // TODO exec(ls)
+		/*
+		 * String current_dir = this.current_dir +"/"; String list = "";
+		 * String[] files = new File(current_dir).list(); for (int i = 0; i <
+		 * files.length; i++) list += files[i] + "\n"; return list;
+		 */
+		File dir = new File(this.current_dir + "/" + path);
+		if (!dir.isFile())
+			return "error"; // TODO
+		String cmd = "ls -l " + this.current_dir + "/" + path;
+		String content = "";
+		Process p = Runtime.getRuntime().exec(cmd);
+		p.waitFor();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				p.getInputStream()));
+		String line = reader.readLine();
+		while (line != null) {
+			System.out.println(line);
+			content += line + "\r\n";
+			line = reader.readLine();
+		}
+		return content;
+	}
+
 	/**
-	*
-	* Méthode pour traiter la commande list
-	* 
-	* @param msg Un message conforme au protocole rfc 959 décrivant le protocole Ftp a traiter. 
-	*
-	* @return 
-	*
-	*/
-	
-	public String processLIST(String msg) throws UnknownHostException, IOException
-	{
+	 * 
+	 * Méthode pour traiter la commande list
+	 * 
+	 * @param msg
+	 *            Un message conforme au protocole rfc 959 décrivant le
+	 *            protocole Ftp a traiter.
+	 * 
+	 * @return
+	 * @throws InterruptedException
+	 * 
+	 */
 
-		//return send_to_dtp(list);
+	public String processLIST(String msg) throws UnknownHostException,
+			IOException, InterruptedException {
+
+		// return send_to_dtp(list);
 		this.client_active = true;
-		this.client_files = infoFile();
+		this.client_files = infoFile(msg);
 		return READING_CONTENT;
-		
+
 	}
-	
+
 	/**
-	*
-	* Méthode pour traiter la commande pwd
-	* @param 
-	*
-	* @return 
-	*
-	*/
-	
+	 * 
+	 * Méthode pour traiter la commande pwd
+	 * 
+	 * @param
+	 * 
+	 * @return
+	 * 
+	 */
+
 	public String processPWD() {
 		return "257 " + this.current_dir + "\r\n";
 	}
 
 	/**
-	*
-	* Méthode  pour traiter la commande quit
-	* 
-	* @param void
-	*
-	* @return le code 221
-	*	
-	*/
-	public String processQUIT()
-	{
+	 * 
+	 * Méthode pour traiter la commande quit
+	 * 
+	 * @param void
+	 * 
+	 * @return le code 221
+	 * 
+	 */
+	public String processQUIT() {
 		String rep = "";
 		rep = QUIT;
 		return rep;
 	}
-	
-	public String send_to_dtp(String data) throws UnknownHostException, IOException
-	{
-		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
-		DataOutputStream out2 = new DataOutputStream(this.client_socket.getOutputStream()); 
+
+	public String send_to_dtp(String data) throws UnknownHostException,
+			IOException {
+		this.client_socket = new Socket(this.client_dpt_addr,
+				this.client_dpt_port);
+		DataOutputStream out2 = new DataOutputStream(
+				this.client_socket.getOutputStream());
+
 		out2.writeBytes(data);
 		out2.close();
 		this.client_socket.close();
 		return "200 \r\n";
 	}
-	
-	public void run()
-	{
+
+	public void run() {
 		String message = new String();
+
 		try { 
 			InputStream is = connexion.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
+			DataOutputStream out = new DataOutputStream(
+					connexion.getOutputStream());
 			out.writeBytes(SERVEUR_SERVICE_READY);
 			while ((message = br.readLine()) != null) {
 				this.processRequest(message);
@@ -329,6 +362,9 @@ public class FtpRequest extends Thread {
 			System.out.println("Fermeture");
 			connexion.close();
 		} catch (IOException e) {
+			throw new RuntimeException(e);
+
+		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}
