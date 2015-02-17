@@ -33,8 +33,5 @@ public class Messages {
 	public static final String ABORTED_LOCAL_ERROR = "451 Requested action aborted. Local error in processing.\r\n";
 	
 	
-			
-			
-			
-			
+		
 }

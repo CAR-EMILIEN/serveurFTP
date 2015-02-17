@@ -256,12 +256,7 @@ public class FtpRequest extends Thread {
 	}
 
 	public String infoFile(String path) throws IOException,
-			InterruptedException { // TODO exec(ls)
-		/*
-		 * String current_dir = this.current_dir +"/"; String list = "";
-		 * String[] files = new File(current_dir).list(); for (int i = 0; i <
-		 * files.length; i++) list += files[i] + "\n"; return list;
-		 */
+			InterruptedException { 
 		File dir = new File(this.current_dir + "/" + path);
 		if (!dir.isFile())
 			return "error"; // TODO
