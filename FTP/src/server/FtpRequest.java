@@ -254,7 +254,18 @@ public class FtpRequest extends Thread {
 	public String processSTOR(String msg) {
 		return "";
 	}
-
+		
+	/** 
+	 * Donne des informations sur un repertoire/fichier donné.
+	 * (utilise ls)
+	 * 
+	 * @param path le chemin du repertoire/fichier dont on veut des informations
+	 *  
+	 * @return les informations obtenues sur le fichier/dossier si il existe
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public String infoFile(String path) throws IOException,
 			InterruptedException { 
 		File dir = new File(this.current_dir + "/" + path);
