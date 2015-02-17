@@ -1,7 +1,7 @@
 package util;
 
 /**
- * Classe contenant les messages renvoyés par le serveur
+ * Classe contenant les messages renvoyés par le serveur au client Ftp
  */
 public class Messages {
 
@@ -25,12 +25,14 @@ public class Messages {
 	public static final String NOT_IMPLEMENTED = "111 Not implemented.\n";
 	public static final String READING_CONTENT = "150 About to read directory content!\r\n";
 	
-	public static final String SUCCESS = "220 tout va bien\n";
+	public static final String SUCCESS = "220 Tout va bien\n";
 	
 	public static final String QUIT = "221 \n";
 	public static final String SYNTAX_ERROR = "520 \n";
 	
-	public static final String toto = "";		
+	public static final String ABORTED_LOCAL_ERROR = "451 Requested action aborted. Local error in processing.\r\n";
+	
+	
 			
 			
 			

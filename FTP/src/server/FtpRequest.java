@@ -53,12 +53,12 @@ public class FtpRequest extends Thread {
 		this.map = map;
 		this.active = true;
 		this.connexion = connexion;
-		this.current_dir = "Data/FTP_ressources";
+		this.current_dir = "FTP/Data/FTP_ressources";
 	}	
 	
 	/**
 	*
-	* Le constructeur pour FtpRequest 
+	* Le constructeur pour FtpRequest  (surtout utilisé pour les tests
 	*
 	*
 	* @param connexion la Socket par lequelle on communique les commandes avec le client Ftp
@@ -89,7 +89,6 @@ public class FtpRequest extends Thread {
 		String rep = "";
 		String[] tmp = null;
 		
-		System.out.println(msg);
 		tmp = msg.split(" ",2);
 		switch(tmp[0])
 		{
@@ -121,7 +120,6 @@ public class FtpRequest extends Thread {
 			default:
 				rep = NOT_IMPLEMENTED;
 		}
-		System.out.println(rep);
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 		out.writeBytes(rep);
 		if (client_active) {
@@ -197,9 +195,9 @@ public class FtpRequest extends Thread {
 	public String processSYST()
 	{
 		return "UNIX Type: L8\n";
-	}
+	} 
 	
-	public String processPORT(String msg) throws UnknownHostException, IOException
+	
 	/**
 	* Méthode pour traiter la commande port
 	* Cette commande sert au client-Ftp à spécifier une adresse ip et un 
@@ -212,6 +210,8 @@ public class FtpRequest extends Thread {
 	*
 	*
 	*/
+	public String processPORT(String msg) throws UnknownHostException, IOException
+	
 	{	
 		String rep = "";
 		String[] tmp = msg.split(",");
@@ -305,12 +305,9 @@ public class FtpRequest extends Thread {
 	
 	public String send_to_dtp(String data) throws UnknownHostException, IOException
 	{
-		System.out.println(this.client_dpt_addr + " : " + this.client_dpt_port);
 		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
-		System.out.println(this.client_socket.getPort());
 		DataOutputStream out2 = new DataOutputStream(this.client_socket.getOutputStream()); 
 		out2.writeBytes(data);
-		System.out.println(data);
 		out2.close();
 		this.client_socket.close();
 		return "200 \r\n";
@@ -319,7 +316,7 @@ public class FtpRequest extends Thread {
 	public void run()
 	{
 		String message = new String();
-		try { //TODO la gestion des exceptions
+		try { 
 			InputStream is = connexion.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
@@ -332,8 +329,7 @@ public class FtpRequest extends Thread {
 			System.out.println("Fermeture");
 			connexion.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 }
