@@ -35,6 +35,7 @@ public class FtpRequest extends Thread {
 	protected Socket client_socket = null;
 	protected boolean client_active = false;
 
+	protected String root;
 	protected String current_dir;
 	private String client_files;
 	private boolean client_retrieving = false;
@@ -53,16 +54,18 @@ public class FtpRequest extends Thread {
 	 * @param map
 	 *            Une HashMap contenant des paires username:password des
 	 *            utilisateurs connus du serveur Ftp
+	 * @param args 
 	 * 
 	 * @return
 	 */
 
-	public FtpRequest(Socket connexion, HashMap<String, String> map) {
+	public FtpRequest(Socket connexion, HashMap<String, String> map, String path) {
 		this.user = "";
 		this.map = map;
 		this.active = true;
 		this.connexion = connexion;
-		this.current_dir = "Data/FTP_ressources";
+		this.current_dir = path;
+		this.root = path;
 	}	/**
 	 * 
 	 * Le constructeur pour FtpRequest (surtout utilisé pour les tests
@@ -82,8 +85,8 @@ public class FtpRequest extends Thread {
 	 * 
 	 * 
 	 */
-	public FtpRequest( Socket connexion,String msg, HashMap<String, String> map) {
-		this(connexion,map);
+	public FtpRequest( Socket connexion,String msg, HashMap<String, String> map,String path) {
+		this(connexion,map,path);
 		this.msg = msg;
 	}
 
@@ -199,7 +202,7 @@ public class FtpRequest extends Thread {
 	 * Méthode pour traiter la commande pass Cette commande suit la commande
 	 * user, et demande a l'utilisateur si il est autorisé à s'identifier avec
 	 * son mot de passe pour lui permettre d'accéder aux fonctions qui ne sont
-	 * pas read-only (par exemple store et retrieve)
+	 * pas read-only (par exemplehis.client_files = infoFile(msg) store et retrieve)
 	 * 
 	 * 
 	 * @param msg
@@ -331,7 +334,7 @@ public class FtpRequest extends Thread {
 		String pathRep = "";
 		File dir = null;
 		if (path == "") {
-			pathRep = "";
+			pathRep = this.current_dir;
 			dir = new File(this.current_dir);
 		} else {
 			pathRep = this.current_dir + "/" + path;
@@ -372,7 +375,6 @@ public class FtpRequest extends Thread {
 			return ABORTED_LOCAL_ERROR;
 		this.client_active = true;
 		return READING_CONTENT;
-
 	}
 
 	/**
