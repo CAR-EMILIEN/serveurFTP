@@ -29,14 +29,21 @@ public class FtpRequest extends Thread {
 	protected Serveur serveur;
 	protected Boolean active;
 	private HashMap<String, String> map;
-
+	
+	
 	protected String client_dpt_addr;
 	protected int client_dpt_port;
 	protected Socket client_socket = null;
 	protected boolean client_active = false;
 
+	/* La racine des documents du serveur (passé en paramètre au lancement du serveur)*/
 	protected String root;
+	/* Le dossier dans lequel l'utilisateur se trouve actuellement.
+	 * Ce dossier est forcement un dossier fils de root.
+	 */
 	protected String current_dir;
+	
+	
 	private String client_files;
 	private boolean client_retrieving = false;
 	private boolean client_storing = false;
@@ -54,7 +61,8 @@ public class FtpRequest extends Thread {
 	 * @param map
 	 *            Une HashMap contenant des paires username:password des
 	 *            utilisateurs connus du serveur Ftp
-	 * @param args 
+	 * @param path
+	 *             Le chemin vers le dossier qui sera la racine du serveur
 	 * 
 	 * @return
 	 */
@@ -111,6 +119,9 @@ public class FtpRequest extends Thread {
 
 		
 		tmp = msg.split(" ",2);
+		String arg = "";
+		if (tmp.length>1)
+			arg = tmp[1];
 		switch(tmp[0])
 		{
 			case "USER":
@@ -130,14 +141,14 @@ public class FtpRequest extends Thread {
 				rep = processPORT(tmp[1]);
 				break;
 			case "LIST":
-				String arg = "";
-				if (tmp.length>1)
-					arg = tmp[1];
 				rep = processLIST(arg);
 				this.client_active = true;
 				break;
 			case "PWD":
 				rep = processPWD();
+				break;
+			case "CWD":
+				rep = processCWD(arg);
 				break;
 			case "STORE":
 				rep = processSTOR(tmp[1]);
@@ -153,6 +164,7 @@ public class FtpRequest extends Thread {
 		DataOutputStream out = new DataOutputStream(connexion.getOutputStream()); 
 
 		out.writeBytes(rep);
+		
 		if (client_active) {
 				send_to_dtp(this.client_files);
 				out.writeBytes(SUCCESS);
@@ -389,6 +401,53 @@ public class FtpRequest extends Thread {
 
 	public String processPWD() {
 		return "257 " + this.current_dir + "\r\n";
+	}
+	
+	/**
+	 * Méthode pour traiter la commande CWD
+	 * 
+	 * @param path Le chemin vers lequel on veut se déplacer
+	 * 
+	 * @return Le message qu'on renvoi au client Ftp
+	 */
+	public String processCWD(String path) {
+		String rep = "333 TOTO";
+		
+		File f = new File(this.current_dir,path);
+		
+		if (path.equals("") || path.equals("."))
+		{
+			rep = FILE_OK+ " directory is still" +this.current_dir + "\n";
+		}
+		else if (path.equals(".."))
+		{
+			//on regarde qu'on n'est pas à la racine
+			if (this.current_dir.equals(this.root))
+			{
+				rep = FILE_OK + " cant go behind root_directory. directory is " + this.current_dir + "\n";
+			}
+			//et on remonte dans le parent
+			else
+			{
+				File tmp  = new File(this.current_dir);
+				this.current_dir = tmp.getParent();
+				rep = FILE_OK +" directory is now " + this.current_dir + "\n";
+			}
+		}
+		else 
+		{
+			if (f.isDirectory())
+			{
+				this.current_dir = f.getPath();
+				rep = FILE_OK + this.current_dir + "\n";
+			}
+			else
+			{
+				rep = ABORTED_LOCAL_ERROR;
+			}
+		}
+		
+		return rep;
 	}
 
 	/**

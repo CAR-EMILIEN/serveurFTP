@@ -30,6 +30,8 @@ public class Messages {
 	public static final String NO_CONNECTION = "425 No data connection has been estblished with the client\r\n";
 	public static final String RETRIEVE_OK = "226 The file was succesfully sent!\r\n";
 	
+	public static final String FILE_OK = "257";
+	
 	public static final String QUIT = "221 \n";
 	public static final String SYNTAX_ERROR = "520 \n";
 	
