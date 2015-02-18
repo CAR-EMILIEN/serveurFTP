@@ -150,6 +150,9 @@ public class FtpRequest extends Thread {
 			case "CWD":
 				rep = processCWD(arg);
 				break;
+			case "CDUP":
+				rep  = processCDUP();
+				break;
 			case "STORE":
 				rep = processSTOR(tmp[1]);
 				break;
@@ -450,6 +453,12 @@ public class FtpRequest extends Thread {
 		return rep;
 	}
 
+	public String processCDUP()
+	{
+		return processCWD("..");
+	}
+	
+	
 	/**
 	 * 
 	 * Méthode pour traiter la commande quit
@@ -495,7 +504,7 @@ public class FtpRequest extends Thread {
 	*
 	*/
 	public String send_file(String pathfile) throws UnknownHostException, IOException {
-		File f = new File(this.current_dir+"/"+pathfile);
+		File f = new File(this.current_dir,pathfile);
 		this.client_socket = new Socket(this.client_dpt_addr, this.client_dpt_port);
 		byte[] buffer = new byte[BLOC_SIZE];
 		DataInputStream dis = new DataInputStream(this.client_socket.getInputStream());
