@@ -153,7 +153,7 @@ public class FtpRequest extends Thread {
 			case "CDUP":
 				rep  = processCDUP();
 				break;
-			case "STORE":
+			case "STOR":
 				rep = processSTOR(tmp[1]);
 				break;
 			case "RETR":
@@ -326,9 +326,10 @@ public class FtpRequest extends Thread {
 	 * 
 	 */
 	public String processSTOR(String file) {
-		File f = new File(this.current_dir+"/"+file);
+		/*File f = new File(this.current_dir,file);
 		if (!f.isFile())
 			return ABORTED_LOCAL_ERROR;
+		*/
 		client_storing = true;
 		return STORING_READY;
 	}
@@ -414,13 +415,13 @@ public class FtpRequest extends Thread {
 	 * @return Le message qu'on renvoi au client Ftp
 	 */
 	public String processCWD(String path) {
-		String rep = "333 TOTO";
+		String rep = "9999 TOTO";
 		
 		File f = new File(this.current_dir,path);
 		
 		if (path.equals("") || path.equals("."))
 		{
-			rep = FILE_OK+ " directory is still" +this.current_dir + "\n";
+			rep = FILE_OK+ " directory is still " +this.current_dir + "\n";
 		}
 		else if (path.equals(".."))
 		{
@@ -442,7 +443,7 @@ public class FtpRequest extends Thread {
 			if (f.isDirectory())
 			{
 				this.current_dir = f.getPath();
-				rep = FILE_OK + this.current_dir + "\n";
+				rep = FILE_OK + " " + this.current_dir + "\n";
 			}
 			else
 			{
@@ -504,7 +505,17 @@ public class FtpRequest extends Thread {
 	*
 	*/
 	public String send_file(String pathfile) throws UnknownHostException, IOException {
+		File tmp = new File(this.current_dir);
+		tmp.setExecutable(true);
+		tmp.setReadable(true);
+		tmp.setWritable(true);
+		
 		File f = new File(this.current_dir,pathfile);
+		f.setReadable(true);
+		f.setWritable(true);
+		f.setExecutable(true);
+		
+		System.out.println("on recupere: " + pathfile);
 		this.client_socket = new Socket(this.client_dpt_addr, this.client_dpt_port);
 		byte[] buffer = new byte[BLOC_SIZE];
 		DataInputStream dis = new DataInputStream(this.client_socket.getInputStream());
