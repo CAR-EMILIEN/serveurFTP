@@ -158,8 +158,6 @@ public class FtpRequest extends Thread {
 				break;
 			case "RETR":
 				rep = processRETR(tmp[1]);
-				if (!rep.equals("451 The file cannot be found on the server\r\n"))
-					this.client_retrieving = true;
 				break;
 			default:
 				rep = NOT_IMPLEMENTED;
@@ -181,6 +179,7 @@ public class FtpRequest extends Thread {
 			this.client_socket = null;
 		}
 		if (client_retrieving) {
+			System.out.println("lolilou");
 			rep = retrieve_file(tmp[1]);
 			this.client_retrieving = false;
 			this.client_socket = null;
@@ -290,22 +289,27 @@ public class FtpRequest extends Thread {
 	}
 
 	public String processRETR(String file) {
-		File fileToR = new File(this.current_dir+ "/" + file);
-		if (!fileToR.exists()) 
+		File fileToR = new File(this.current_dir, file);
+		if (!fileToR.exists()){
 			return "451 The file cannot be found on the server\r\n";
+		}
+		this.client_retrieving = true;
 		return "150 Going to send the file\r\n";
 	}
 	
 	public String retrieve_file(String file) throws UnknownHostException, IOException{
-		File fileToR = new File(this.current_dir+ "/" + file);
+		File fileToR = new File(this.current_dir,file);
+		System.out.println("vivaaaaaaaant");
 		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
 		FileInputStream fis = new FileInputStream(fileToR);
 		DataOutputStream cos = new DataOutputStream(this.client_socket.getOutputStream());
 		byte[] buffer = new byte[BLOC_SIZE];
 		int read = 0;
+		System.out.println("tjr vivant");
 		while ((read = fis.read(buffer)) > 0) {
 			cos.write(buffer, 0, read);
 		}
+		System.out.println("mourute");
 		cos.close();
 		fis.close();
 		this.client_socket.close();
@@ -326,10 +330,6 @@ public class FtpRequest extends Thread {
 	 * 
 	 */
 	public String processSTOR(String file) {
-		/*File f = new File(this.current_dir,file);
-		if (!f.isFile())
-			return ABORTED_LOCAL_ERROR;
-		*/
 		client_storing = true;
 		return STORING_READY;
 	}

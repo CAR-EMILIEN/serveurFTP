@@ -20,7 +20,7 @@ public class FtpRequestTest {
 		String msg_init = "USER TOTO";
 		HashMap<String,String> hm = new HashMap<>();
 		hm.put("TOTO", "963");
-		f = new FtpRequest(null,msg_init,hm);
+		f = new FtpRequest(null,msg_init,hm,"");
 	}
 
 	@Test
