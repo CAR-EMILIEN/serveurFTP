@@ -288,6 +288,15 @@ public class FtpRequest extends Thread {
 		return rep;
 	}
 
+	/**
+	 * Méthode pour traiter la commande RETR (retrieve)
+	 * 
+	 * 
+	 * 
+	 * @param file Le nom du fichier qu'on veut déposer au client
+	 * @return Un code indiquant l'état de l'échange, 150 si le fichier existe sur le serveur,
+	 * 		   , 451 sinon
+	 */
 	public String processRETR(String file) {
 		File fileToR = new File(this.current_dir, file);
 		if (!fileToR.exists()){
@@ -297,19 +306,27 @@ public class FtpRequest extends Thread {
 		return "150 Going to send the file\r\n";
 	}
 	
+	/**
+	 * Méthode qui gére la reception de fichier envoyé au client
+	 * via la connexion data
+	 * 
+	 * @param file Le nom du fichier qui va être reçu
+	 * 
+	 * @return Un code pour indiquer au serveur la reussite ou l'echec
+	 * 
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public String retrieve_file(String file) throws UnknownHostException, IOException{
 		File fileToR = new File(this.current_dir,file);
-		System.out.println("vivaaaaaaaant");
 		this.client_socket = new Socket(this.client_dpt_addr,this.client_dpt_port);
 		FileInputStream fis = new FileInputStream(fileToR);
 		DataOutputStream cos = new DataOutputStream(this.client_socket.getOutputStream());
 		byte[] buffer = new byte[BLOC_SIZE];
 		int read = 0;
-		System.out.println("tjr vivant");
 		while ((read = fis.read(buffer)) > 0) {
 			cos.write(buffer, 0, read);
 		}
-		System.out.println("mourute");
 		cos.close();
 		fis.close();
 		this.client_socket.close();
@@ -454,6 +471,12 @@ public class FtpRequest extends Thread {
 		return rep;
 	}
 
+	/**
+	 * Méthode qui traite la commande CDUP
+	 * (en pratique, fait appel à CWD)
+	 * 
+	 * @return Un code pour que le client sache ou il se trouve à présent dans l'arborescence
+	 */
 	public String processCDUP()
 	{
 		return processCWD("..");
