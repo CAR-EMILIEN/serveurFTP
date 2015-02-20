@@ -32,6 +32,9 @@ public class Messages {
 	
 	public static final String FILE_OK = "250";
 	
+	public static final String NO_FEATURES = "211 No features\r\n";
+	public static final String PARAM_ERROR = "501 Syntax error in parameters or arguments.\r\n";
+	
 	public static final String QUIT = "221 \n";
 	public static final String SYNTAX_ERROR = "520 \n";
 	

@@ -75,21 +75,24 @@ public class FtpRequestTest {
 	public void test_processPORT() throws UnknownHostException, IOException {
 		String msg = "";
 		String rep = f.processPORT(msg);
-		
 		assertTrue(rep.equals(SYNTAX_ERROR));
 		
 		msg = "127,0,0,1,231,25";
 		rep = f.processPORT(msg);
-		
 		assertTrue(rep.equals(SUCCESS));
 		
 		msg = "skdfmlkd";
 		rep = f.processPORT(msg);
-		
-		assertTrue(rep.equals(SYNTAX_ERROR));
-		
-		
+		assertTrue(rep.equals(SYNTAX_ERROR));	
 	}
+	
+	@Test
+	public void test_processFEAT()
+	{
+		String rep = f.processFEAT();
+		assertTrue(rep.equals(NO_FEATURES));
+	}
+	
 	
 	@Test
 	public void test_processQUIT() {
