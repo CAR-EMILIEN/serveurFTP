@@ -159,6 +159,11 @@ public class FtpRequest extends Thread {
 			case "RETR":
 				rep = processRETR(tmp[1]);
 				break;
+			case "FEAT":
+				if (tmp.length>1)
+					rep = PARAM_ERROR;
+				else
+					rep = processFEAT();
 			default:
 				rep = NOT_IMPLEMENTED;
 		}
@@ -551,6 +556,16 @@ public class FtpRequest extends Thread {
 		dis.close();
 		this.client_socket.close();
 		return STORE_OK;
+	}
+	
+	/**
+	 * Méthode traitant la commande FEAT
+	 * En pratique on renvoi toujours 211 car on n'implémente aucune commande faisant parti des extensions
+	 * 
+	 */
+	public String processFEAT()
+	{
+		return NO_FEATURES;
 	}
 	
 	/**
