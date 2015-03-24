@@ -297,6 +297,7 @@ public class FtpRequest extends Thread {
 		return "150 Going to send the file\r\n";
 	}
 	
+	
 	public String retrieve_file(String file) throws UnknownHostException, IOException{
 		File fileToR = new File(this.current_dir,file);
 		System.out.println("vivaaaaaaaant");
