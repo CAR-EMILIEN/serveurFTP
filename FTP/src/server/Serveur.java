@@ -19,7 +19,11 @@ public class Serveur {
 	public Serveur(int port) throws IOException
 	{	
 		this.map_user = new HashMap<String,String>();
-		this.load_map_user("Data/map_user");
+		this.map_user.put("TOTO", "123");
+		this.map_user.put("EMILIEN", "123");
+		this.map_user.put("JULIE", "123");
+		//disabled to make the jar work:(
+		//this.load_map_user("Data/map_user");
 		this.socket = new ServerSocket(port);
 	}
 	
@@ -27,6 +31,7 @@ public class Serveur {
 	public Serveur(int port,String filename) throws IOException
 	{
 		this.map_user = new HashMap<String,String>();
+		
 		this.load_map_user(filename);
 		this.socket = new ServerSocket(port);
 
