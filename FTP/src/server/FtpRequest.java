@@ -294,12 +294,12 @@ public class FtpRequest extends Thread {
 	}
 
 	/**
-	 * Méthode pour traiter la commande RETR (retrieve)
+	 * Mï¿½thode pour traiter la commande RETR (retrieve)
 	 * 
 	 * 
 	 * 
-	 * @param file Le nom du fichier qu'on veut déposer au client
-	 * @return Un code indiquant l'état de l'échange, 150 si le fichier existe sur le serveur,
+	 * @param file Le nom du fichier qu'on veut dï¿½poser au client
+	 * @return Un code indiquant l'ï¿½tat de l'ï¿½change, 150 si le fichier existe sur le serveur,
 	 * 		   , 451 sinon
 	 */
 	public String processRETR(String file) {
@@ -312,10 +312,10 @@ public class FtpRequest extends Thread {
 	}
 
 	/**
-	 * Méthode qui gére la reception de fichier envoyé au client
+	 * Mï¿½thode qui gï¿½re la reception de fichier envoyï¿½ au client
 	 * via la connexion data
 	 * 
-	 * @param file Le nom du fichier qui va être reçu
+	 * @param file Le nom du fichier qui va ï¿½tre reï¿½u
 	 * 
 	 * @return Un code pour indiquer au serveur la reussite ou l'echec
 	 * 
@@ -443,21 +443,21 @@ public class FtpRequest extends Thread {
 		
 		if (path.equals("") || path.equals("."))
 		{
-			rep = FILE_OK+ " directory is still " +this.current_dir + "\n";
+			rep = FILE_OK+ " directory is still " +this.current_dir + "\r\n";
 		}
 		else if (path.equals(".."))
 		{
 			//on regarde qu'on n'est pas Ã  la racine
 			if (this.current_dir.equals(this.root))
 			{
-				rep = FILE_OK + " cant go behind root_directory. directory is " + this.current_dir + "\n";
+				rep = FILE_OK + " cant go behind root_directory. directory is " + this.current_dir + "\r\n";
 			}
 			//et on remonte dans le parent
 			else
 			{
 				File tmp  = new File(this.current_dir);
 				this.current_dir = tmp.getParent();
-				rep = FILE_OK +" directory is now " + this.current_dir + "\n";
+				rep = FILE_OK +" directory is now " + this.current_dir + "\r\n";
 			}
 		}
 		else 
@@ -465,7 +465,7 @@ public class FtpRequest extends Thread {
 			if (f.isDirectory())
 			{
 				this.current_dir = f.getPath();
-				rep = FILE_OK + " " + this.current_dir + "\n";
+				rep = FILE_OK + " " + this.current_dir + "\r\n";
 			}
 			else
 			{
@@ -477,10 +477,10 @@ public class FtpRequest extends Thread {
 	}
 
 	/**
-	 * Méthode qui traite la commande CDUP
-	 * (en pratique, fait appel à CWD)
+	 * Mï¿½thode qui traite la commande CDUP
+	 * (en pratique, fait appel ï¿½ CWD)
 	 * 
-	 * @return Un code pour que le client sache ou il se trouve à présent dans l'arborescence
+	 * @return Un code pour que le client sache ou il se trouve ï¿½ prï¿½sent dans l'arborescence
 	 */
 	public String processCDUP()
 	{
@@ -559,8 +559,8 @@ public class FtpRequest extends Thread {
 	}
 	
 	/**
-	 * Méthode traitant la commande FEAT
-	 * En pratique on renvoi toujours 211 car on n'implémente aucune commande faisant parti des extensions
+	 * Mï¿½thode traitant la commande FEAT
+	 * En pratique on renvoi toujours 211 car on n'implï¿½mente aucune commande faisant parti des extensions
 	 * 
 	 */
 	public String processFEAT()
